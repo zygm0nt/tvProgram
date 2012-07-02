@@ -41,7 +41,7 @@ public class ProgramAdapter extends ArrayAdapter<String> {
         TextView programNumber = (TextView) rowView.findViewById(R.id.program_number);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.logo);
 
-        programNumber.setText(current.split("_")[0]);
+        programNumber.setText("" + Integer.parseInt(current.split("_")[0]));
         textView.setText(current.split("_")[1]);
 
         Log.d("ProgramAdapter", "I'm at " + current);
