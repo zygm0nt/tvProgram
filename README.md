@@ -34,4 +34,5 @@ Drop me a message...
 TODO
 ====
 * switch to [ExpandableListView](http://qtcstation.com/2011/03/working-with-the-expandablelistview-part-1/)
-* ...
+* ListView should be populated with objects (Program)! not stupid Strings
+* Samsung Galaxy Ace has a HVGA screen, text displayed on it is too big
