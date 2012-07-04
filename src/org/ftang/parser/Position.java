@@ -17,4 +17,13 @@ public class Position {
         this.endTime = endTime;
         this.nowAiring = nowAiring;
     }
+
+    @Override
+    public String toString() {
+        return "<li>" +
+                (nowAiring ? "<b>" : "") + title +
+                ((type != null && type.length() > 0)? " (" + type + ")" : "" ) +
+                " [" + startTime + " - " +
+                endTime + "]" + (nowAiring ? "</b>" : "") + "</li>";
+    }
 }

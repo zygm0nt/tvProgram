@@ -16,12 +16,12 @@ import java.util.*;
  */
 public class JSoupParser implements Parser {
 
+    private final List<String> hours = new ArrayList<String>();
+
     @Override
     public Map<String, List<Position>> parse(String in) throws IOException {
         Map<String, List<Position>> tvProgram = new HashMap<String, List<Position>>();
-        
-        List<String> hours = new ArrayList<String>();
-        
+
         Document doc = Jsoup.parse(in, "UTF-8");
 
         Iterator<Element> iter = doc.select("table#grid tr").iterator();
@@ -37,6 +37,10 @@ public class JSoupParser implements Parser {
             }
         }
         return tvProgram;
+    }
+
+    public List<String> getHours() {
+        return hours;
     }
 
     private List<Position> getProgramPositions(Elements input) {

@@ -14,6 +14,8 @@ public interface SimpleExternalCache {
 
     String get();
 
+    List<Position> get(String programName);
+    
     boolean isEmpty();
 
     boolean isUpToDate();

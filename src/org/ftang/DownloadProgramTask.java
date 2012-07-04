@@ -5,24 +5,25 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import org.ftang.cache.SimpleExternalCache;
 import org.ftang.parser.JSoupParser;
 import org.ftang.parser.Position;
+import org.ftang.wrapper.ResultWrapper;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 /**
  * User: marcin
  */
-public class DownloadProgramTask extends AsyncTask<String, String, String> {
+public class DownloadProgramTask extends AsyncTask<String, String, ResultWrapper> {
     
     private static final String URL = "http://www.teleman.pl/program-tv?stations=all";
     private Context ctx;
@@ -33,43 +34,45 @@ public class DownloadProgramTask extends AsyncTask<String, String, String> {
         this.externalCache = externalCache;
     }
 
+    /*
+       This method receives value = '02_stationName'
+    */
     @Override
-    protected String doInBackground(String... params) {
+    protected ResultWrapper doInBackground(String... params) {
 
+        String programName = params[0].split("_")[1].toUpperCase();
         // params comes from the execute() call: params[0] is the url.
         try {
-            /*if (externalCache.isEmpty() || !externalCache.isUpToDate())
+            if (externalCache.isEmpty() || !externalCache.isUpToDate())
                 externalCache.store(downloadUrl(URL));
-            return prepareContent(externalCache.get(), params[0]);*/
-            return prepareContent(downloadUrl(URL), params[0]);
+            return prepareContent(externalCache.get(programName), programName);
+            //return prepareContent(downloadUrl(URL), params[0]);
         } catch (IOException e) {
-            return "Unable to retrieve web page. URL may be invalid.";
+            return new ResultWrapper("ERROR", "Unable to retrieve web page. URL may be invalid.");
         }
     }
 
-    /*
-        This method receives value = '02_stationName'
-     */
-    private String prepareContent(String content, String value) {
-        try {
-            Map<String, List<Position>> programs = new JSoupParser().parse(content);
-            String programName = value.split("_")[1].toUpperCase();
-            Log.d(getClass().getSimpleName(), "Content length " + content.length() );
-            Log.d(getClass().getSimpleName(), "Fetching program for " + programName);
-            Log.d(getClass().getSimpleName(), "Have this keys available:" + Arrays.toString(programs.keySet().toArray()));
 
-            if (programs.containsKey(programName))
-                return programs.get(programName).toString();
-            return "";
-        } catch (IOException e) {
-            return "ERROR: " + e.getMessage();
+    private ResultWrapper prepareContent(List<Position> positions, String programName) {
+         return new ResultWrapper(programName, stringify(positions));
+    }
+
+    private String stringify(List<Position> positions) {
+        if (positions.size() == 0)
+            return "Empty...";
+
+        StringBuilder sb = new StringBuilder();
+        for (Position p : positions) {
+            sb.append(p.toString());
+            sb.append("\n");
         }
+        return sb.toString();
     }
 
     // onPostExecute displays the results of the AsyncTask.
     @Override
-    protected void onPostExecute(String result) {
-        createDialog(result).show();
+    protected void onPostExecute(ResultWrapper result) {
+        createDialog(result.content, result.title).show();
     }
 
     private String downloadUrl(String myurl) throws IOException {
@@ -106,16 +109,17 @@ public class DownloadProgramTask extends AsyncTask<String, String, String> {
         }
     }
     
-    private Dialog createDialog(String content) {
-        final Dialog dialog = new Dialog(ctx);
+    private Dialog createDialog(String content, String title) {
+        final Dialog dialog = new Dialog(ctx, R.style.myBackgroundStyle);
         dialog.setContentView(R.layout.program_dialog);
-        dialog.setTitle("Title...");
+        dialog.setTitle(title);
 
         // set the custom dialog components - text, image and button
-        TextView text = (TextView) dialog.findViewById(R.id.text);
-        text.setText(content);
-        ImageView image = (ImageView) dialog.findViewById(R.id.image);
-        image.setImageResource(R.drawable.freebsd_logo);
+        WebView text = (WebView) dialog.findViewById(R.id.text);
+        text.setScrollBarStyle(WebView.OVER_SCROLL_IF_CONTENT_SCROLLS);
+        final String mimeType = "text/html";
+        final String encoding = "UTF-8";
+        text.loadDataWithBaseURL("", "<ul>" + content + "</ul>", mimeType, encoding, "");
 
         Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
         // if button is clicked, close the custom dialog

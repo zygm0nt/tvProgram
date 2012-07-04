@@ -2,12 +2,11 @@ package org.ftang.cache;
 
 import android.content.Context;
 import android.util.Log;
+import org.ftang.parser.JSoupParser;
 import org.ftang.parser.Position;
 
 import java.io.*;
-import java.util.Date;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * User: marcin
@@ -19,7 +18,8 @@ public class SimpleExternalCacheImpl implements SimpleExternalCache {
     private static final long TIME_SKEW = 10 * 60 * 1000;
     private long lastParseDate = 0L;
 
-
+    private Map<String, List<Position>> programs;
+            
     private Context ctx;
 
     private String filename;
@@ -35,7 +35,7 @@ public class SimpleExternalCacheImpl implements SimpleExternalCache {
             Log.d(getClass().getSimpleName(), "Storing file " + f.getAbsolutePath());
             f.createNewFile();
 
-            FileWriter fw = new FileWriter(f.getName());
+            FileWriter fw = new FileWriter(f.getAbsolutePath());
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(content);
             bw.close();
@@ -78,6 +78,22 @@ public class SimpleExternalCacheImpl implements SimpleExternalCache {
             Log.e(getClass().getSimpleName(), "Error fetching file: ", e);
         }
         return null;
+    }
+
+    @Override
+    public List<Position> get(String programName) {
+        if (programs == null) {
+            JSoupParser parser = new JSoupParser();
+            try {
+                programs = parser.parse(get());
+            } catch (IOException e) {
+                return null;
+            }
+            List<String> hours = parser.getHours();
+        }
+        if (programs.containsKey(programName))
+            return programs.get(programName);
+        return new ArrayList<Position>();
     }
 
     @Override
