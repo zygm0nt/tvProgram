@@ -19,7 +19,7 @@ is being fetched from http://www.teleman.pl/program-tv?stations=all
 How does this look?
 ===================
 
-![The only two screens of this app :)](zygm0nt.github.com/tvProgram/images/tvProgram-screen.png "Two screens")
+![The only two screens of this app :)](http://zygm0nt.github.com/tvProgram/images/tvProgram-screen.png "Two screens")
 
 
 What now?
