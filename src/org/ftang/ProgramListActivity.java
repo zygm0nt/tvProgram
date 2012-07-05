@@ -109,8 +109,8 @@ public class ProgramListActivity extends ListActivity {
     
     private Dialog showAlert(String title, String msg) {
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("Reset...");
-        alertDialog.setMessage("Are you sure?");
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(msg);
         alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
