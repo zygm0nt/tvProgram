@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import org.ftang.adapter.ProgramAdapter;
 import org.ftang.cache.SimpleExternalCache;
 import org.ftang.cache.SimpleExternalCacheImpl;
+import org.ftang.model.Program;
+import org.ftang.parser.Position;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +33,9 @@ public class ProgramListActivity extends ListActivity {
     private static final String DEBUG_TAG = "ProgramList-NetworkStatus";
 
     private SimpleExternalCache externalCache;
+
+    DownloadProgramTask downloadProgramTask;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,45 +47,43 @@ public class ProgramListActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        String selectedValue = (String) getListAdapter().getItem(position);
+        Program selectedValue = (Program) getListAdapter().getItem(position);
 
         if (isOnline()) {
-            new DownloadProgramTask(this, externalCache).execute(selectedValue);
+            runTaskIfNeeded(selectedValue);
         } else {
             //Toast.makeText(this, "Network error!", Toast.LENGTH_SHORT).show();
             showAlert("Error!", "No network connection").show();
         }
     }
     
-    private Map<String, String> createList() {
-        Map<String, String> programs = new HashMap<String, String>();
-        List<String> rawLines = readRawTextFile(getBaseContext(), R.raw.programs);
-        for (String line : rawLines) {
-            String[] tokens = line.split(",");
-            if (tokens.length == 4)
-                programs.put(padding(tokens[2], 2) + "_" + tokens[1], tokens[3]); // FIXME TODO
-            else
-                programs.put(padding(tokens[2], 2) + "_" + tokens[1], "placeholder"); // FIXME TODO
+    private void runTaskIfNeeded(Program selectedValue) {
+        if (downloadProgramTask == null)
+            downloadProgramTask = new DownloadProgramTask(this, externalCache);
+        if (!downloadProgramTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
+            Toast.makeText(this, "Starting download task!", Toast.LENGTH_SHORT).show();
+            downloadProgramTask.execute(selectedValue);
+        } else {
+            Toast.makeText(this, "Task state conditions unmet: " + downloadProgramTask.getStatus(), Toast.LENGTH_SHORT).show();
         }
-        
-        return programs;
+    }
+    
+    private List<Program> createList() {
+        return readRawTextFile(getBaseContext(), R.raw.programs);
     }
 
-    private String padding(String token, int position) {
-        return String.format("%0" + position + "d", Integer.parseInt(token));
-    }
 
-    public static List<String> readRawTextFile(Context ctx, int resId) {
+    public static List<Program> readRawTextFile(Context ctx, int resId) {
         InputStream inputStream = ctx.getResources().openRawResource(resId);
 
         InputStreamReader inputreader = new InputStreamReader(inputStream);
         BufferedReader buffreader = new BufferedReader(inputreader);
         String line;
-        List<String> l = new ArrayList<String>();
+        List<Program> l = new ArrayList();
         
         try {
             while (( line = buffreader.readLine()) != null) {
-                l.add(line);
+                l.add(new Program(line));
             }
         } catch (IOException e) {
             return null;

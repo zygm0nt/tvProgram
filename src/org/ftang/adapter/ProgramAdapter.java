@@ -10,29 +10,28 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import org.ftang.R;
+import org.ftang.model.Program;
 
 import java.util.*;
 
-public class ProgramAdapter extends ArrayAdapter<String> {
+public class ProgramAdapter extends ArrayAdapter<Program> {
     private final Context context;
-    private final Map<String, String> values;
+    private final List<Program> values;
     
-    private final List<String> namesOrdered;
 
-    public ProgramAdapter(Context context, Map<String, String> values) {
+    public ProgramAdapter(Context context, List<Program> values) {
         super(context, R.layout.program_list);
         this.context = context;
         this.values = values;
-        namesOrdered = new ArrayList<String> (values.keySet());
-        Collections.sort(namesOrdered);
-        for (String name : namesOrdered)
-            add(name);
+        Collections.sort(values);
+        for (Program program : values)
+            add(program);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         
-        String current = namesOrdered.get(position);
+        Program current = values.get(position);
         
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -41,12 +40,12 @@ public class ProgramAdapter extends ArrayAdapter<String> {
         TextView programNumber = (TextView) rowView.findViewById(R.id.program_number);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.logo);
 
-        programNumber.setText("" + Integer.parseInt(current.split("_")[0]));
-        textView.setText(current.split("_")[1]);
+        programNumber.setText("" + Integer.parseInt(current.getNumber()));
+        textView.setText(current.getName());
 
         Log.d("ProgramAdapter", "I'm at " + current);
 
-        imageView.setImageDrawable(getImage(values.get(current)));
+        imageView.setImageDrawable(getImage(current.getImage()));
         return rowView;
     }
 

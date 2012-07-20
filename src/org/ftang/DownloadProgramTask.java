@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import org.ftang.cache.SimpleExternalCache;
+import org.ftang.model.Program;
 import org.ftang.parser.JSoupParser;
 import org.ftang.parser.Position;
 import org.ftang.wrapper.ResultWrapper;
@@ -23,7 +24,7 @@ import java.util.Map;
 /**
  * User: marcin
  */
-public class DownloadProgramTask extends AsyncTask<String, String, ResultWrapper> {
+public class DownloadProgramTask extends AsyncTask<Program, String, ResultWrapper> {
     
     private static final String URL = "http://www.teleman.pl/program-tv?stations=all";
     private Context ctx;
@@ -38,9 +39,9 @@ public class DownloadProgramTask extends AsyncTask<String, String, ResultWrapper
        This method receives value = '02_stationName'
     */
     @Override
-    protected ResultWrapper doInBackground(String... params) {
+    protected ResultWrapper doInBackground(Program... params) {
 
-        String programName = params[0].split("_")[1].toUpperCase();
+        String programName = params[0].getName().toUpperCase();
         // params comes from the execute() call: params[0] is the url.
         try {
             if (externalCache.isEmpty() || !externalCache.isUpToDate())
