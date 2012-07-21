@@ -9,7 +9,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -17,16 +18,14 @@ import org.ftang.adapter.ProgramAdapter;
 import org.ftang.cache.SimpleExternalCache;
 import org.ftang.cache.SimpleExternalCacheImpl;
 import org.ftang.model.Program;
-import org.ftang.parser.Position;
+import org.ftang.touch.HandleGestures;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ProgramListActivity extends ListActivity {
 
@@ -35,14 +34,17 @@ public class ProgramListActivity extends ListActivity {
     private SimpleExternalCache externalCache;
 
     DownloadProgramTask downloadProgramTask;
-    
+
+    private GestureDetector gestureScanner;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         externalCache = new SimpleExternalCacheImpl(this);
 
-        setListAdapter(new ProgramAdapter(this, createList()));
+        gestureScanner = new GestureDetector(new HandleGestures(this));
 
+        setListAdapter(new ProgramAdapter(this, createList()));
     }
 
     @Override
@@ -58,10 +60,10 @@ public class ProgramListActivity extends ListActivity {
     }
     
     private void runTaskIfNeeded(Program selectedValue) {
-        if (downloadProgramTask == null)
+        if (downloadProgramTask == null || downloadProgramTask.getStatus().equals(AsyncTask.Status.FINISHED))
             downloadProgramTask = new DownloadProgramTask(this, externalCache);
         if (!downloadProgramTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
-            Toast.makeText(this, "Starting download task!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Starting download task!", Toast.LENGTH_SHORT).show();
             downloadProgramTask.execute(selectedValue);
         } else {
             Toast.makeText(this, "Task state conditions unmet: " + downloadProgramTask.getStatus(), Toast.LENGTH_SHORT).show();
@@ -122,4 +124,19 @@ public class ProgramListActivity extends ListActivity {
         });
         return alertDialog;
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent me) {
+        return gestureScanner.onTouchEvent(me);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (gestureScanner != null) {
+            if (gestureScanner.onTouchEvent(ev))
+                return true;
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
 }
