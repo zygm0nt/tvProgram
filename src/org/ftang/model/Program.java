@@ -49,4 +49,13 @@ public class Program implements Comparable<Program> {
     public int compareTo(Program program) {
         return Integer.parseInt(getNumber()) - Integer.parseInt(program.getNumber());
     }
+
+    @Override
+    public String toString() {
+        return "Program{" +
+                "number='" + number + '\'' +
+                ", image='" + image + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

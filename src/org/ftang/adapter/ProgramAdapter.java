@@ -35,7 +35,7 @@ public class ProgramAdapter extends ArrayAdapter<Program> {
         
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        View rowView = inflater.inflate(R.layout.program_list, parent, false);
+        View rowView = inflater.inflate(R.layout.program_list_row, parent, false);
         TextView textView = (TextView) rowView.findViewById(R.id.label);
         TextView programNumber = (TextView) rowView.findViewById(R.id.program_number);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.logo);
@@ -43,7 +43,7 @@ public class ProgramAdapter extends ArrayAdapter<Program> {
         programNumber.setText("" + Integer.parseInt(current.getNumber()));
         textView.setText(current.getName());
 
-        Log.d("ProgramAdapter", "I'm at " + current);
+        //Log.d("ProgramAdapter", "I'm at " + current);
 
         imageView.setImageDrawable(getImage(current.getImage()));
         return rowView;
