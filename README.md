@@ -33,6 +33,5 @@ Drop me a message...
 
 TODO
 ====
-* switch to [ExpandableListView](http://qtcstation.com/2011/03/working-with-the-expandablelistview-part-1/)
 * add programs to calendar 
 * add full program view

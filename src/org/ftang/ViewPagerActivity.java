@@ -9,10 +9,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.MotionEvent;
 import org.ftang.fragment.CustomPagerAdapter;
-import org.ftang.fragment.MyFragment;
+import org.ftang.fragment.DetailsFragment;
 import org.ftang.fragment.ProgramListFragment;
+import org.ftang.wrapper.ResultWrapper;
 
 
 /**
@@ -40,7 +40,7 @@ public class ViewPagerActivity extends FragmentActivity implements ProgramListFr
 
         List<Fragment> fragments = new Vector<Fragment>();
         fragments.add(Fragment.instantiate(this, ProgramListFragment.class.getName()));
-        fragments.add(Fragment.instantiate(this, MyFragment.class.getName()));
+        fragments.add(Fragment.instantiate(this, DetailsFragment.class.getName()));
         this.mPagerAdapter  = new CustomPagerAdapter(super.getSupportFragmentManager(), fragments);
 
         ViewPager pager = (ViewPager)super.findViewById(R.id.viewpager);
@@ -56,8 +56,10 @@ public class ViewPagerActivity extends FragmentActivity implements ProgramListFr
     }
 
     @Override
-    public void onArticleSelected(int position) {
+    public void onArticleSelected(ResultWrapper result) {
         Log.d(DEBUG_TAG, "onArticleSelected");
+        DetailsFragment.fillView(super.findViewById(R.id.program_dialog), result);
+
         ViewPager pager = (ViewPager)super.findViewById(R.id.viewpager);
         pager.setCurrentItem(1);
     }

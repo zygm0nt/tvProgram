@@ -1,17 +1,12 @@
 package org.ftang;
 
-import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import org.ftang.cache.SimpleExternalCache;
+import org.ftang.fragment.ProgramListFragment;
 import org.ftang.model.Program;
-import org.ftang.parser.JSoupParser;
 import org.ftang.parser.Position;
 import org.ftang.wrapper.ResultWrapper;
 
@@ -19,7 +14,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: marcin
@@ -29,10 +23,15 @@ public class DownloadProgramTask extends AsyncTask<Program, String, ResultWrappe
     private static final String URL = "http://www.teleman.pl/program-tv?stations=all";
     private Context ctx;
     private SimpleExternalCache externalCache;
+    private ProgramListFragment.OnProgramSelectedListener mCallback;
 
-    public DownloadProgramTask(Context ctx, SimpleExternalCache externalCache) {
+    private ProgressDialog progressDialog;
+
+    public DownloadProgramTask(Context ctx, SimpleExternalCache externalCache,
+                               ProgramListFragment.OnProgramSelectedListener mCallback) {
         this.ctx = ctx;
         this.externalCache = externalCache;
+        this.mCallback = mCallback;
     }
 
     /*
@@ -42,20 +41,21 @@ public class DownloadProgramTask extends AsyncTask<Program, String, ResultWrappe
     protected ResultWrapper doInBackground(Program... params) {
 
         String programName = params[0].getName().toUpperCase();
+        String imgName = params[0].getImage();
         // params comes from the execute() call: params[0] is the url.
         try {
             if (externalCache.isEmpty() || !externalCache.isUpToDate())
                 externalCache.store(downloadUrl(URL));
-            return prepareContent(externalCache.get(programName), programName);
+            return prepareContent(externalCache.get(programName), programName, imgName);
             //return prepareContent(downloadUrl(URL), params[0]);
         } catch (IOException e) {
-            return new ResultWrapper("ERROR", "Unable to retrieve web page. URL may be invalid.");
+            return new ResultWrapper("ERROR", "Unable to retrieve web page. URL may be invalid.", imgName);
         }
     }
 
 
-    private ResultWrapper prepareContent(List<Position> positions, String programName) {
-         return new ResultWrapper(programName, stringify(positions));
+    private ResultWrapper prepareContent(List<Position> positions, String programName, String imgName) {
+         return new ResultWrapper(programName, stringify(positions), imgName);
     }
 
     private String stringify(List<Position> positions) {
@@ -73,7 +73,9 @@ public class DownloadProgramTask extends AsyncTask<Program, String, ResultWrappe
     // onPostExecute displays the results of the AsyncTask.
     @Override
     protected void onPostExecute(ResultWrapper result) {
-        createDialog(result.content, result.title).show();
+        mCallback.onArticleSelected(result);
+        if (progressDialog != null)
+            progressDialog.dismiss();
     }
 
     private String downloadUrl(String myurl) throws IOException {
@@ -109,28 +111,8 @@ public class DownloadProgramTask extends AsyncTask<Program, String, ResultWrappe
             return "";
         }
     }
-    
-    private Dialog createDialog(String content, String title) {
-        final Dialog dialog = new Dialog(ctx, R.style.myBackgroundStyle);
-        dialog.setContentView(R.layout.program_dialog);
-        dialog.setTitle(title);
 
-        // set the custom dialog components - text, image and button
-        WebView text = (WebView) dialog.findViewById(R.id.text);
-        text.setScrollBarStyle(WebView.OVER_SCROLL_IF_CONTENT_SCROLLS);
-        final String mimeType = "text/html";
-        final String encoding = "UTF-8";
-        text.loadDataWithBaseURL("", "<ul>" + content + "</ul>", mimeType, encoding, "");
-
-        Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
-        // if button is clicked, close the custom dialog
-        dialogButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        return dialog;
+    public void setProgressDialog(ProgressDialog progressDialog) {
+        this.progressDialog = progressDialog;
     }
 }

@@ -45,15 +45,8 @@ public class ProgramAdapter extends ArrayAdapter<Program> {
 
         //Log.d("ProgramAdapter", "I'm at " + current);
 
-        imageView.setImageDrawable(getImage(current.getImage()));
+        imageView.setImageDrawable(ImageUtil.getImage(getContext(), current.getImage()));
         return rowView;
     }
 
-    private Drawable getImage(String name) {
-        String uri = "drawable/" + name;
-        Log.d("ProgramAdapter", "Fetching " + name);
-        int imageResource = getContext().getResources().getIdentifier(uri, null, getContext().getPackageName());
-        Drawable image = getContext().getResources().getDrawable(imageResource);
-        return image;
-    }
 }

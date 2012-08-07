@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+             android:id="@+id/program_dialog"
              android:layout_width="fill_parent"
              android:layout_height="fill_parent">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:orientation="vertical"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent" >
+
+        <LinearLayout android:orientation="horizontal"
+                      android:layout_width="fill_parent"
+                      android:layout_height="fill_parent">
+
+            <ImageView android:id="@+id/channelIcon"
+                       android:layout_width="50px"
+                       android:layout_height="50px"
+                       android:layout_marginLeft="5px"
+                       android:layout_marginRight="20px"
+                       android:layout_marginTop="5px"
+                       android:src="@drawable/freebsd_logo" />
+            <TextView android:id="@+id/channelName"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@+id/label"
+                      android:textSize="22px"
+                      android:layout_marginLeft="70px"
+                      android:layout_marginTop="5px"/>
+        </LinearLayout>
 
         <WebView
                 android:id="@+id/text"

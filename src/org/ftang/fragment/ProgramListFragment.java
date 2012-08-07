@@ -3,6 +3,7 @@ package org.ftang.fragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
@@ -21,6 +22,7 @@ import org.ftang.cache.SimpleExternalCache;
 import org.ftang.cache.SimpleExternalCacheImpl;
 import org.ftang.model.Program;
 import org.ftang.touch.HandleGestures;
+import org.ftang.wrapper.ResultWrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,9 +42,11 @@ public class ProgramListFragment extends ListFragment implements View.OnTouchLis
 
     OnProgramSelectedListener mCallback;
 
+    private ProgressDialog progressDialog;
+
     // Container Activity must implement this interface
     public interface OnProgramSelectedListener {
-        public void onArticleSelected(int position);
+        public void onArticleSelected(ResultWrapper result);
     }
 
     /** (non-Javadoc)
@@ -77,18 +81,17 @@ public class ProgramListFragment extends ListFragment implements View.OnTouchLis
         if (isOnline()) {
             runTaskIfNeeded(selectedValue);
         } else {
-            //Toast.makeText(this, "Network error!", Toast.LENGTH_SHORT).show();
             showAlert("Error!", "No network connection").show();
         }
-        mCallback.onArticleSelected(1);
     }
 
 
     private void runTaskIfNeeded(Program selectedValue) {
         if (downloadProgramTask == null || downloadProgramTask.getStatus().equals(AsyncTask.Status.FINISHED))
-            downloadProgramTask = new DownloadProgramTask(getActivity(), externalCache);
+            downloadProgramTask = new DownloadProgramTask(getActivity(), externalCache, mCallback);
         if (!downloadProgramTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
-            //Toast.makeText(this, "Starting download task!", Toast.LENGTH_SHORT).show();
+            progressDialog = ProgressDialog.show(getActivity(), "I'm in a middle of sth","Fetching program info", true, false, null);
+            downloadProgramTask.setProgressDialog(progressDialog);
             downloadProgramTask.execute(selectedValue);
         } else {
             Toast.makeText(getActivity(), "Task state conditions unmet: " + downloadProgramTask.getStatus(), Toast.LENGTH_SHORT).show();
