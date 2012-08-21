@@ -33,7 +33,7 @@ public class JSoupParserTest {
     @Test
     public void testShouldParsePrograms() throws Exception {
         String testProgram = "TVP 1";
-        List<Position> nowAiringPrograms = fixture.parse(convertStreamToString(getClass().getResourceAsStream("sample.program.html"))).get(testProgram);
+        List<Position> nowAiringPrograms = fixture.parse(convertStreamToString(getClass().getResourceAsStream("/sample.program.html"))).get(testProgram);
         assertProgramPosition(nowAiringPrograms, 0, "Malibu - atak rekinów", "thriller", "21:35", "23:05", true);
         assertProgramPosition(nowAiringPrograms, 1, "Sensacyjne lato w Jedynce: Glina (3/25)", "serial kryminalny", "23:05", "0:10", false);
     }
@@ -41,7 +41,15 @@ public class JSoupParserTest {
     @Test
     public void testShouldParsePrograms2() throws Exception {
         String testProgram = "TVP 1";
-        List<Position> nowAiringPrograms = fixture.parse(convertStreamToString(getClass().getResourceAsStream("sample.program.2.html"))).get(testProgram);
+        List<Position> nowAiringPrograms = fixture.parse(convertStreamToString(getClass().getResourceAsStream("/sample.program.2.html"))).get(testProgram);
+        assertProgramPosition(nowAiringPrograms, 0, "Piłka nożna: Euro 2012", "święto radości", "20:25", "22:00", true);
+        assertProgramPosition(nowAiringPrograms, 1, "Sensacyjne lato w Jedynce: Glina (6/25)", "serial kryminalny", "22:00", "23:05", false);
+    }
+
+    @Test
+    public void testShouldParsePrograms3() throws Exception {
+        String testProgram = "TVP 1";
+        List<Position> nowAiringPrograms = fixture.parse(convertStreamToString(getClass().getResourceAsStream("/sample.program.3.html"))).get(testProgram);
         assertProgramPosition(nowAiringPrograms, 0, "Piłka nożna: Euro 2012", "święto radości", "20:25", "22:00", true);
         assertProgramPosition(nowAiringPrograms, 1, "Sensacyjne lato w Jedynce: Glina (6/25)", "serial kryminalny", "22:00", "23:05", false);
     }
@@ -50,7 +58,7 @@ public class JSoupParserTest {
     @Test
     public void shouldIterateOverPrograms() throws Exception {
         List<String> programList = getProgramList();
-        Map<String, List<Position>> programMapping = fixture.parse(convertStreamToString(getClass().getResourceAsStream("sample.program.2.html")));
+        Map<String, List<Position>> programMapping = fixture.parse(convertStreamToString(getClass().getResourceAsStream("/sample.program.2.html")));
         System.out.println("Have this keys available:" + Arrays.toString(programMapping.keySet().toArray()));
         for (String programName : programList) {
             System.out.println("Processing " + programName);
@@ -65,7 +73,7 @@ public class JSoupParserTest {
 
     private List<String> getProgramList() {
         List<String> programList = new ArrayList<String>();
-        InputStream is = getClass().getResourceAsStream("/org/ftang/parser/programs.html");
+        InputStream is = getClass().getResourceAsStream("/programs.html");
         for (String line : convertStreamToString(is).split("\n"))
             programList.add(line.split(",")[1].toUpperCase());
         return programList;
