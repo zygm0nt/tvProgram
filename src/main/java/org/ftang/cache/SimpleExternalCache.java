@@ -8,7 +8,7 @@ import java.util.List;
  * User: marcin
  */
 public interface SimpleExternalCache {
-    boolean store(String content);
+    boolean store(String programName, String content);
 
     boolean flush();
 
@@ -19,4 +19,6 @@ public interface SimpleExternalCache {
     boolean isEmpty();
 
     boolean isUpToDate();
+
+    boolean contains(String programName);
 }

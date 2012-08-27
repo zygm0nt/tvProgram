@@ -12,5 +12,5 @@ import java.util.Map;
  * User: marcin
  */
 public interface Parser {
-    Map<String, List<Position>> parse(String in) throws IOException;
+    List<Position> parse(String in) throws IOException;
 }

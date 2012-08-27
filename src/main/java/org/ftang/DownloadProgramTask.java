@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class DownloadProgramTask extends AsyncTask<Program, String, ResultWrapper> {
     
-    private static final String URL = "http://www.teleman.pl/program-tv?stations=all";
+    private static final String URL = "http://www.teleman.pl/program-tv/stacje/%s";
     private Context ctx;
     private SimpleExternalCache externalCache;
     private ProgramListFragment.OnProgramSelectedListener mCallback;
@@ -34,9 +34,6 @@ public class DownloadProgramTask extends AsyncTask<Program, String, ResultWrappe
         this.mCallback = mCallback;
     }
 
-    /*
-       This method receives value = '02_stationName'
-    */
     @Override
     protected ResultWrapper doInBackground(Program... params) {
 
@@ -44,13 +41,16 @@ public class DownloadProgramTask extends AsyncTask<Program, String, ResultWrappe
         String imgName = params[0].getImage();
         // params comes from the execute() call: params[0] is the url.
         try {
-            if (externalCache.isEmpty() || !externalCache.isUpToDate())
-                externalCache.store(downloadUrl(URL));
+            if (externalCache.isEmpty() || !externalCache.contains(programName))
+                externalCache.store(programName, downloadUrl(urlFor(programName)));
             return prepareContent(externalCache.get(programName), programName, imgName);
-            //return prepareContent(downloadUrl(URL), params[0]);
         } catch (IOException e) {
             return new ResultWrapper("ERROR", "Unable to retrieve web page. URL may be invalid.", imgName);
         }
+    }
+
+    private String urlFor(String programName) {
+        return String.format(URL, programName.toUpperCase().replace(" ", "-"));
     }
 
 

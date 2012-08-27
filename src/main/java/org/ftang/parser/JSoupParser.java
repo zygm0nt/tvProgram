@@ -19,22 +19,16 @@ public class JSoupParser implements Parser {
     private final List<String> hours = new ArrayList<String>();
 
     @Override
-    public Map<String, List<Position>> parse(String in) throws IOException {
-        Map<String, List<Position>> tvProgram = new HashMap<String, List<Position>>();
+    public List<Position> parse(String in) throws IOException {
+        List<Position> tvProgram = new ArrayList<Position>();
 
         Document doc = Jsoup.parse(in, "UTF-8");
 
-        Iterator<Element> iter = doc.select("table#grid tr").iterator();
+        Iterator<Element> iter = doc.select("table#station_listing tr").iterator();
         while (iter.hasNext()) {
             Element elem = iter.next();
-            if ("group".equals(elem.attr("class"))) { // skip 
-            } else if ("ruler".equals(elem.attr("class"))) {
-                hours.addAll(getProgramHours(elem.select("div")));        
-            } else {
-                String stationName = getStationName(elem.select("td.station").first());
-                List<Position> positions = getProgramPositions(elem.select("td.cell > div"));
-                tvProgram.put(stationName.toUpperCase(), positions);
-            }
+            tvProgram.add(getProgramPosition(elem.select("th").text(), elem.select("td"),
+                    !elem.select("span[title=trwa]").isEmpty()));
         }
         return tvProgram;
     }
@@ -43,18 +37,12 @@ public class JSoupParser implements Parser {
         return hours;
     }
 
-    private List<Position> getProgramPositions(Elements input) {
-        List<Position> positions = new ArrayList<Position>();
-        Iterator<Element> iter = input.iterator();
-        while (iter.hasNext()) {
-            Element elem = iter.next();
-            positions.add(new Position(elem.select("a").text(),
+    private Position getProgramPosition(String hour, Elements elem, boolean airing) {
+        return new Position(elem.select("a.prog_title").text(),
                     elem.select("div.genre").text(), 
-                    elem.select("span.time").text(),
-                    elem.select("span.time").attr("data-stop"), 
-                    !elem.select("span[title=trwa]").isEmpty()));
-        }
-        return positions;
+                    hour,
+                    elem.select("p.excerpt").text(),
+                    airing);
     }
 
     private String getStationName(Element stationTag) {

@@ -31,29 +31,14 @@ public class JSoupParserTest {
     }
 
     @Test
-    public void testShouldParsePrograms() throws Exception {
-        String testProgram = "TVP 1";
-        List<Position> nowAiringPrograms = fixture.parse(convertStreamToString(getClass().getResourceAsStream("/sample.program.html"))).get(testProgram);
-        assertProgramPosition(nowAiringPrograms, 0, "Malibu - atak rekinów", "thriller", "21:35", "23:05", true);
-        assertProgramPosition(nowAiringPrograms, 1, "Sensacyjne lato w Jedynce: Glina (3/25)", "serial kryminalny", "23:05", "0:10", false);
-    }
-
-    @Test
-    public void testShouldParsePrograms2() throws Exception {
-        String testProgram = "TVP 1";
-        List<Position> nowAiringPrograms = fixture.parse(convertStreamToString(getClass().getResourceAsStream("/sample.program.2.html"))).get(testProgram);
-        assertProgramPosition(nowAiringPrograms, 0, "Piłka nożna: Euro 2012", "święto radości", "20:25", "22:00", true);
-        assertProgramPosition(nowAiringPrograms, 1, "Sensacyjne lato w Jedynce: Glina (6/25)", "serial kryminalny", "22:00", "23:05", false);
-    }
-
-    @Test
     public void testShouldParsePrograms3() throws Exception {
-        String testProgram = "TVP 1";
-        List<Position> nowAiringPrograms = fixture.parse(convertStreamToString(getClass().getResourceAsStream("/sample.program.3.html"))).get(testProgram);
-        assertProgramPosition(nowAiringPrograms, 0, "Piłka nożna: Euro 2012", "święto radości", "20:25", "22:00", true);
-        assertProgramPosition(nowAiringPrograms, 1, "Sensacyjne lato w Jedynce: Glina (6/25)", "serial kryminalny", "22:00", "23:05", false);
+        List<Position> nowAiringPrograms = fixture.parse(convertStreamToString(getClass().getResourceAsStream("/sample.program.3.html")));
+        assertProgramPosition(nowAiringPrograms, 0, "Biały Kieł 2: Legenda białego wilka", "film przygodowy, USA 1994", "20:20", true);
+        assertProgramPosition(nowAiringPrograms, 1, "Sensacyjne lato w Jedynce: Determinator (1/13)", "serial kryminalny", "22:15", false);
     }
 
+/*
+    TODO FIXME assert program links are actually accessible
     private String[] excluded = {"TVN METEO", "ITV", "MANGO 24", "ASTERINFO", "MULTIPIP", "RUSSIA TODAY", "CNN"};
     @Test
     public void shouldIterateOverPrograms() throws Exception {
@@ -68,8 +53,7 @@ public class JSoupParserTest {
             Assert.assertNotNull(result);
             Assert.assertTrue(result.size() > 0);
         }
-        
-    }
+    }*/
 
     private List<String> getProgramList() {
         List<String> programList = new ArrayList<String>();
@@ -79,12 +63,11 @@ public class JSoupParserTest {
         return programList;
     }
 
-    private void assertProgramPosition(List<Position> nowAiringPrograms, int idx, String expectedTitle, String expectedType, String expectedStartTime, String expectedEndTime, boolean expectedAiring) {
+    private void assertProgramPosition(List<Position> nowAiringPrograms, int idx, String expectedTitle, String expectedType, String expectedStartTime, boolean expectedAiring) {
         Assert.assertNotNull(nowAiringPrograms.get(idx));
         Assert.assertEquals(expectedTitle, nowAiringPrograms.get(idx).title);
         Assert.assertEquals(expectedType, nowAiringPrograms.get(idx).type);
         Assert.assertEquals(expectedStartTime, nowAiringPrograms.get(idx).startTime);
-        Assert.assertEquals(expectedEndTime, nowAiringPrograms.get(idx).endTime);
         Assert.assertEquals(expectedAiring, nowAiringPrograms.get(idx).nowAiring);
     }
 }

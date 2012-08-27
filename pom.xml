@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <groupId>org.ftang</groupId>
     <artifactId>tvProgram</artifactId>
     <name>TVProgram :: APK</name>
@@ -12,6 +12,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <android.version>4.0.1.2</android.version>
         <abs.version>4.1.0</abs.version>
+
+        <sign.keyAlias>tvProgramKey</sign.keyAlias>
+        <sign.keystore>~/keystores/tvProgram.keystore</sign.keystore>
+        <sign.storePass></sign.storePass>
+        <sign.keyPass></sign.keyPass>
     </properties>
 
     <dependencies>
@@ -131,10 +136,10 @@
                                 <configuration>
                                     <removeExistingSignatures>true</removeExistingSignatures>
                                     <archiveDirectory />
-                                    <keystore>~/keystores/tvProgram.keystore</keystore>
-                                    <alias>tvProgramKey</alias>
-                                    <storepass>whatever</storepass>
-                                    <keypass>whatever</keypass>
+                                    <keystore>${sign.keystore}</keystore>
+                                    <alias>${sign.keyAlias}</alias>
+                                    <storepass>${sign.storePass}</storepass>
+                                    <keypass>${sign.keyPass}</keypass>
                                     <verbose>true</verbose>
                                 </configuration>
                             </execution>

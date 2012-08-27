@@ -18,7 +18,7 @@ public class SimpleExternalCacheImpl implements SimpleExternalCache {
     private static final long TIME_SKEW = 10 * 60 * 1000;
     private long lastParseDate = 0L;
 
-    private Map<String, List<Position>> programs;
+    private Map<String, List<Position>> programs = new HashMap<String, List<Position>>();
             
     private Context ctx;
 
@@ -29,7 +29,19 @@ public class SimpleExternalCacheImpl implements SimpleExternalCache {
     }
 
     @Override
-    public boolean store(String content) {
+    public boolean store(String programName, String content) {
+        lastParseDate = new Date().getTime();
+        filename = "";
+        JSoupParser parser = new JSoupParser();
+        try {
+            programs.put(programName, parser.parse(content));
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean storeToFile(String content) {
         File f = new File(ctx.getCacheDir(), "tvProgramApp-" + UUID.randomUUID().toString());
         try {
             Log.d(getClass().getSimpleName(), "Storing file " + f.getAbsolutePath());
@@ -82,15 +94,6 @@ public class SimpleExternalCacheImpl implements SimpleExternalCache {
 
     @Override
     public List<Position> get(String programName) {
-        if (programs == null) {
-            JSoupParser parser = new JSoupParser();
-            try {
-                programs = parser.parse(get());
-            } catch (IOException e) {
-                return null;
-            }
-            List<String> hours = parser.getHours();
-        }
         if (programs.containsKey(programName))
             return programs.get(programName);
         return new ArrayList<Position>();
@@ -104,5 +107,10 @@ public class SimpleExternalCacheImpl implements SimpleExternalCache {
     @Override
     public boolean isUpToDate() {
         return lastParseDate > 0 && new Date().getTime() - lastParseDate < TIME_SKEW;
+    }
+
+    @Override
+    public boolean contains(String programName) {
+        return programs.containsKey(programName);
     }
 }
